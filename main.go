@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
+	"github.com/Miniand/weigh/model"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/gzip"
 	"github.com/codegangsta/martini-contrib/render"
@@ -10,19 +12,23 @@ import (
 
 func main() {
 	m := martini.Classic()
-	m.Use(render.Renderer())
 	m.Use(gzip.All())
-	m.Use(martini.Static("assets"))
+	m.Use(render.Renderer(render.Options{
+		Layout: "layout",
+	}))
 	m.Get("/:id", Plan)
 	m.Get("/", Index)
 	m.Run()
 }
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/"+base64.StdEncoding.EncodeToString([]byte("fart")),
-		http.StatusFound)
+func Index(r render.Render) {
+	r.Redirect("/" + base64.StdEncoding.EncodeToString([]byte("fart")))
 }
 
-func Plan(params martini.Params) string {
-	return params["id"]
+func Plan(r render.Render) {
+	encoded, err := json.Marshal(model.NewPlan())
+	if err != nil {
+		panic(err.Error())
+	}
+	r.HTML(http.StatusOK, "plan", string(encoded))
 }
