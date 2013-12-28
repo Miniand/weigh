@@ -1,6 +1,8 @@
 'use strict';
 
 angular.module('weigh', [
+	'ui.bootstrap',
+	'd3',
 	'weigh.filters',
 	'weigh.services',
 	'weigh.directives',

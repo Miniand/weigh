@@ -1,5 +1,29 @@
-<div initial ng-if="model.WeighIns.length == 0" model="model"></div>
-<div ng-if="model.WeighIns.length > 0">
-	<div>BMI: {{bmi}} ({{bmiCategory}})</div>
-	<div>PI: {{pi}} ({{piCategory}})</div>
+<div class="container">
+	<div initial ng-if="model.WeighIns.length == 0" model="model"></div>
+	<div ng-if="model.WeighIns.length > 0">
+		<div>BMI: {{bmi}} ({{bmiCategory}})</div>
+		<div>PI: {{pi}} ({{piCategory}})</div>
+		<div style="width:1000px;">
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+				height="500"
+				d3 d3-data="model" d3-renderer="chartUpdate">
+			</svg>
+		</div>
+		<div>
+			<h3>Weigh in</h3>
+			<div ng-model="weighInDt">
+				<datepicker show-weeks="false"></datepicker>
+			</div>
+			<input type="number" ng-model="weighInWeight" />
+			<input type="button" ng-click="saveWeighIn(weighInDt, weighInWeight)" value="Add" />
+		</div>
+		<div>
+			<h3>Goal</h3>
+			<div ng-model="goalDt">
+				<datepicker show-weeks="false"></datepicker>
+			</div>
+			<input type="number" ng-model="goalWeight" />
+			<input type="button" ng-click="saveGoal(goalDt, goalWeight)" value="Add" />
+		</div>
+	</div>
 </div>

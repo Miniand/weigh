@@ -1,6 +1,8 @@
 package model
 
 type Goal struct {
-	At     string
-	Weight float64
+	StartingAt    string
+	DueAt         string
+	InitialWeight float64
+	GoalWeight    float64
 }
