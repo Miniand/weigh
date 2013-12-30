@@ -81,8 +81,8 @@ angular.module('weigh.directives', []).
 				// Default values
 				scope.weighInDt = new Date();
 				scope.goalDt = moment().add('weeks', 6).toDate();
-				scope.weightLineColour = "green";
-				scope.goalLineColour = "rgba(0,0,255,0.3)";
+				scope.weightLineColour = "rgba(0,200,0,0.6)";
+				scope.goalLineColour = "rgba(200,200,0,0.3)";
 				// Callbacks
 				scope.saveWeighIn = function(dt, weight) {
 					saveWeighIn(dt, weight, scope.model.WeighIns);
@@ -150,7 +150,7 @@ angular.module('weigh.directives', []).
 				scope.height = 1.7;
 				scope.weight = 70;
 				scope.setInitial = function(height, weight) {
-					scope.model.Height = height;
+					scope.model.Height = parseFloat(height, 10);
 					saveWeighIn(moment(), weight, scope.model.WeighIns);
 				};
 			}

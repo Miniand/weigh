@@ -1,7 +1,8 @@
 package model
 
 type Plan struct {
-	Height   int
+	Id       string `gorethink:"id,omitempty"`
+	Height   float64
 	Goals    []Goal
 	WeighIns []WeighIn
 }
