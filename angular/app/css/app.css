@@ -6,7 +6,7 @@
 .weight-line {
 	stroke: green;
 	stroke-width: 2;
-	fill: yellow;
+	fill: white;
 }
 .weight-line circle {
 	cursor: pointer;
