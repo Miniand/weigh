@@ -127,8 +127,7 @@
 				<div ng-model="weighInDt">
 					<datepicker show-weeks="false" date-disabled="disabledWeighInDates(date, mode)"></datepicker>
 				</div>
-				<input type="number" ng-model="weighInWeight" ng-show="measurementSystem=='metric'" />
-				<input type="number" ng-model="weighInWeightLb" ng-show="measurementSystem=='imperial'" />
+				<input type="number" step="0.1" ng-model="weighInWeight" ng-show="measurementSystem=='metric'" />
 				<input type="submit" value="Add" />
 			</form>
 		</div>
@@ -138,7 +137,7 @@
 				<div ng-model="goalDt">
 					<datepicker show-weeks="false" date-disabled="disabledGoalDates(date, mode)"></datepicker>
 				</div>
-				<input type="number" ng-model="goalWeight" />
+				<input type="number" step="0.1" ng-model="goalWeight" />
 				<input type="submit" ng-click="" value="Add" />
 			</form>
 		</div>

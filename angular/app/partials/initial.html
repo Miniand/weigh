@@ -1,7 +1,7 @@
 <h1>Please enter your height and current weight to begin</h1>
 
 <form ng-submit="setInitial(height, weight)">
-	<input ng-model="height" type="number" /> cm
-	<input ng-model="weight" type="number" /> kg
+	<input ng-model="height" type="number" step="0.1" /> m
+	<input ng-model="weight" type="number" step="0.1" /> kg
 	<input type="submit" value="Start!" />
 </form>
