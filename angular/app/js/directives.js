@@ -41,15 +41,18 @@ angular.module('weigh.directives', []).
 				var piDistLen = piDistances.length;
 				// Watchers
 				scope.$watch('model.WeighIns.length', function(len) {
-					scope.lastWeighIn = len > 0 ? scope.model.WeighIns[len-1] :
-						null;
+					scope.lastWeighIn = len > 0 ? _.sortBy(scope.model.WeighIns,
+						function(wi) {
+							return wi.At;
+						})[len-1] : null;
 				}, true);
 				scope.$watch('lastWeighIn.Weight', function(weight) {
 					scope.lastWeight = weight;
 				}, true);
 				scope.$watch('model.Height', function() {
-					scope.piPivot = weightFromPonderalIndex(scope.model.Height,
-						ponderalIndexPivot());
+					// scope.piPivot = weightFromPonderalIndex(scope.model.Height,
+					// 	ponderalIndexPivot());
+					scope.piPivot = ponderalIndexPivot();
 					var fullDistances = _.union(_.map(_.clone(piDistances).
 						reverse(), function(d) {
 							return -d;
@@ -57,8 +60,10 @@ angular.module('weigh.directives', []).
 					scope.weightRanges = {};
 					for (var i = 0, len = fullDistances.length; i < len-1; i++) {
 						scope.weightRanges[i-piDistLen+1] = {
-							start: scope.piPivot + fullDistances[i],
-							end: scope.piPivot + fullDistances[i+1]
+							start: weightFromPonderalIndex(scope.model.Height,
+								scope.piPivot + fullDistances[i]),
+							end: weightFromPonderalIndex(scope.model.Height,
+								scope.piPivot + fullDistances[i+1])
 						}						
 					}
 				}, true);
@@ -147,7 +152,7 @@ angular.module('weigh.directives', []).
 						max += (3 - range) / 2;
 						range = 3;
 					}
-					var padding = range * 0.05;
+					var padding = range * 0.1;
 					scope.yAxisRange = {
 						start: min - padding,
 						end: max + padding
@@ -183,28 +188,70 @@ angular.module('weigh.directives', []).
 								scope.toYPosition(wi.Weight);
 						}).join(' L ');
 				}, true);
+				scope.$watch('xAxisRange', function() {
+					var ctr = scope.xAxisRange.start;
+					scope.xAxisTicks = [];
+					while (ctr <= scope.xAxisRange.end) {
+						scope.xAxisTicks.push(ctr);
+						ctr = moment(ctr).add('days', 1).format(dateFormat);
+					}
+					var tickRatio = Math.ceil(scope.xAxisTicks.length / 15);
+					if (tickRatio > 1) {
+						// Too many ticks, reduce by ratio
+						scope.xAxisTicks = _.filter(scope.xAxisTicks,
+							function(t, i) {
+								return i % tickRatio == 0;
+							});
+					}
+				}, true);
+				scope.$watch('yAxisRange', function() {
+					var range = scope.yAxisRange.end - scope.yAxisRange.start;
+					var ticks = 8;
+					scope.yAxisTicks = [];
+					for (var i = 0; i < ticks; i++) {
+						scope.yAxisTicks.push(Math.round(
+							(scope.yAxisRange.start + range * i / ticks)
+							* 10) / 10);
+					}
+				}, true);
+				scope.$watch('dateRangeWeeks', function() {
+					scope.xAxisRange = {
+						start: moment().add('weeks', -scope.dateRangeWeeks).
+							format(dateFormat),
+						end: moment().add('weeks', scope.dateRangeWeeks).
+							format(dateFormat)
+					};
+				}, true);
 				// Default values
 				scope.weighInDt = new Date();
 				scope.goalDt = moment().add('weeks', 6).toDate();
 				scope.weightLineColour = "rgba(0,200,0,0.6)";
 				scope.goalLineColour = "rgba(200,200,0,0.3)";
-				scope.xAxisRange = {
-					start: moment().add('weeks', -3).format(dateFormat),
-					end: moment().add('weeks', 3).format(dateFormat)
-				};
+				scope.dateRangeWeeks = 3;
 				scope.chartViewPort = {
-					width: 1000,
-					height: 500
+					width: 1140,
+					height: 570
 				};
 				scope.chartMargin = {
 					top: 20,
 					right: 20,
-					bottom: 50,
-					left: 50
+					bottom: 90,
+					left: 70
 				};
 				scope.measurementSystem = 'metric';
+				scope.today = moment().format(dateFormat);
 				// Callbacks
 				scope.saveWeighIn = function(dt, weight) {
+					var existingWeighIn = scope.weighInsByAt[moment(dt).format(
+						dateFormat)];
+					if (existingWeighIn !== undefined) {
+						_.each(scope.model.Goals, function(g) {
+							if (g.StartingAt == scope.model.WeighIns[
+								existingWeighIn].At) {
+								g.InitialWeight = parseFloat(weight, 10);
+							}
+						});						
+					}
 					saveWeighIn(dt, weight, scope.model.WeighIns);
 				};
 				scope.saveGoal = function(dt, weight) {
@@ -219,6 +266,16 @@ angular.module('weigh.directives', []).
 				scope.toYPosition = function(weight) {
 					return scope.chartMargin.top + (scope.yAxisRange.end -
 						weight) * scope.yAxisScale;
+				};
+				scope.setWeighInFormTo = function(weighIn) {
+					scope.weighInDt = moment(weighIn.At).toDate();
+					scope.weighInWeight = weighIn.Weight;
+				};
+				scope.disabledWeighInDates = function(date, mode) {
+					return date > moment().endOf('day').toDate();
+				};
+				scope.disabledGoalDates = function(date, mode) {
+					return date <= moment().endOf('day').toDate();
 				};
 			}
 		};

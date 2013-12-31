@@ -1,20 +1,42 @@
 <div class="container">
-	<div>
-		<label>
-			<input ng-model="measurementSystem" type="radio" value="metric" />
-			Metric
-		</label>
-		<label>
-			<input ng-model="measurementSystem" type="radio" value="imperial" />
-			Imperial
-		</label>
-	</div>
 	<div initial ng-if="model.WeighIns.length == 0" model="model"></div>
-	<div ng-if="model.WeighIns.length > 0">
-		<div>PI: {{pi}} ({{piCategory}})</div>
+	<div ng-show="model.WeighIns.length > 0">
+		<div>
+			<label>
+				<input ng-model="measurementSystem" type="radio" value="metric" />
+				Metric
+			</label>
+			<label>
+				<input ng-model="measurementSystem" type="radio" value="imperial" />
+				Imperial
+			</label>
+		</div>
+		<div>
+			<label>
+				<input type="number" min="1" ng-model="dateRangeWeeks" />
+				weeks
+			</label>
+		</div>
+		<div>
+			<label>
+				Expand chart to show PI normal weight range:
+				<input type="checkbox" ng-model="expandToShowPiNormalRange" />
+			</label>
+		</div>
 		<div>
 			<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-				viewBox="0 0 1000 500">
+				class="weight-chart" viewBox="0 0 1140 570"
+				preserveAspectRatio="slice">
+				<!-- Tick grids -->
+				<path ng-repeat="t in xAxisTicks"
+					class="tick-grid"
+					d="M {{toXPosition(t)}} {{chartMargin.top}} V {{chartViewPort.height-chartMargin.bottom}}" />
+				<path ng-repeat="t in yAxisTicks"
+					class="tick-grid"
+					d="M {{chartMargin.left}} {{toYPosition(t)}} H {{chartViewPort.width-chartMargin.right}}" />
+				<path ng-repeat="t in xAxisTicks"
+					class="tick-grid-today"
+					d="M {{toXPosition(today)}} {{chartMargin.top}} V {{chartViewPort.height-chartMargin.bottom}}" />
 				<!-- Weight ranges -->
 				<g class="weight-ranges">
 					<rect class="weight-range-underweight"
@@ -49,7 +71,7 @@
 						<circle cx="{{toXPosition(g.DueAt)}}"
 							cy="{{toYPosition(g.GoalWeight)}}"
 							r="4" />
-						<title>{{g.GoalWeight | weight:measurementSystem}} @ {{g.DueAt}}</title>
+						<title>Goal of {{g.GoalWeight | weight:measurementSystem}} by {{g.DueAt}}</title>
 					</g>
 				</g>
 				<!-- Weight line -->
@@ -58,7 +80,8 @@
 					<circle ng-repeat="wi in displayWeighIns | orderBy:'At'"
 						cx="{{toXPosition(wi.At)}}"
 						cy="{{toYPosition(wi.Weight)}}"
-						r="4">
+						r="4"
+						ng-click="setWeighInFormTo(wi)">
 						<title>{{wi.Weight | weight:measurementSystem}} @ {{wi.At}}</title>
 					</circle>
 				</g>
@@ -80,34 +103,44 @@
 						width="{{chartMargin.left}}"
 						height="{{chartViewPort.height}}" />
 				</g>
+				<!-- Axes -->
 				<g class="axis">
 					<path class="axis-line"
 						d="M {{chartMargin.left}} {{chartMargin.top}} V {{chartViewPort.height-chartMargin.bottom}} H {{chartViewPort.width-chartMargin.right}}" />
+					<text ng-repeat="t in xAxisTicks"
+						class="x-tick-label"
+						x="{{toXPosition(t)}}"
+						y="{{chartViewPort.height-chartMargin.bottom+10}}"
+						text-anchor="end" alignment-baseline="middle"
+						transform="rotate(-90 {{toXPosition(t)}},{{chartViewPort.height-chartMargin.bottom+10}})">{{t}}</text>
+					<text ng-repeat="t in yAxisTicks"
+						class="x-tick-label"
+						x="{{chartMargin.left-10}}"
+						y="{{toYPosition(t)}}"
+						text-anchor="end" alignment-baseline="middle">{{t | weight:measurementSystem}}</text>
 				</g>
 			</svg>
 		</div>
 		<div>
-			<label>
-				Expand chart to show PI normal weight range:
-				<input type="checkbox" ng-model="expandToShowPiNormalRange" />
-			</label>
+			<form ng-submit="saveWeighIn(weighInDt, weighInWeight)">
+				<h3>Weigh in</h3>
+				<div ng-model="weighInDt">
+					<datepicker show-weeks="false" date-disabled="disabledWeighInDates(date, mode)"></datepicker>
+				</div>
+				<input type="number" ng-model="weighInWeight" ng-show="measurementSystem=='metric'" />
+				<input type="number" ng-model="weighInWeightLb" ng-show="measurementSystem=='imperial'" />
+				<input type="submit" value="Add" />
+			</form>
 		</div>
 		<div>
-			<h3>Weigh in</h3>
-			<div ng-model="weighInDt">
-				<datepicker show-weeks="false"></datepicker>
-			</div>
-			<input type="number" ng-model="weighInWeight" ng-show="measurementSystem=='metric'" />
-			<input type="number" ng-model="weighInWeightLb" ng-show="measurementSystem=='imperial'" />
-			<input type="button" ng-click="saveWeighIn(weighInDt, weighInWeight)" value="Add" />
-		</div>
-		<div>
-			<h3>Goal</h3>
-			<div ng-model="goalDt">
-				<datepicker show-weeks="false"></datepicker>
-			</div>
-			<input type="number" ng-model="goalWeight" />
-			<input type="button" ng-click="saveGoal(goalDt, goalWeight)" value="Add" />
+			<form ng-submit="saveGoal(goalDt, goalWeight)">
+				<h3>Goal</h3>
+				<div ng-model="goalDt">
+					<datepicker show-weeks="false" date-disabled="disabledGoalDates(date, mode)"></datepicker>
+				</div>
+				<input type="number" ng-model="goalWeight" />
+				<input type="submit" ng-click="" value="Add" />
+			</form>
 		</div>
 	</div>
 </div>

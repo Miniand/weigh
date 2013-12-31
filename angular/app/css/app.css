@@ -1,3 +1,8 @@
+.weight-chart {
+	max-width: 1140px;
+	max-height: 570px;
+}
+
 .weight-line {
 	stroke: green;
 	stroke-width: 2;
@@ -30,7 +35,23 @@
 }
 
 .axis-line {
+	stroke: #000;
 	stroke-width: 2;
+	fill: none;
+}
+
+.tick-grid {
+	stroke: #DDD;
+	fill: none;
+}
+
+.tick-grid-today {
+	stroke: #FCC;
+	fill: none;
+}
+
+.x-tick-label {
+	text-transform: rotate(90);
 }
 
 .bezel rect {
