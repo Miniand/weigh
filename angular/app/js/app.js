@@ -177,3 +177,11 @@ function categoriseIndex(index, pivot, distances) {
 	}
 	return category * polarity;
 }
+
+function lbToKg(lb) {
+	return lb * 0.45359237;
+}
+
+function kgToLb(kg) {
+	return kg / 0.45359237;
+}

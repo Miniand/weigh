@@ -1,0 +1,39 @@
+.weight-line {
+	stroke: green;
+	stroke-width: 2;
+	fill: yellow;
+}
+.weight-line circle {
+	cursor: pointer;
+}
+.weight-line path {
+	fill: none;
+}
+
+.goal-lines {
+	stroke: orange;
+	stroke-width: 2;
+	fill: white;
+	cursor: pointer;
+}
+.goal-lines path {
+	fill: none;
+	stroke-dasharray: 5,10;
+}
+
+.weight-range-overweight, .weight-range-underweight {
+	fill: rgba(255,255,0,0.1);
+}
+
+.weight-range-normal {
+	fill: rgba(0,255,0,0.1);
+}
+
+.axis-line {
+	stroke-width: 2;
+}
+
+.bezel rect {
+	fill: white;
+	stroke: none;
+}
